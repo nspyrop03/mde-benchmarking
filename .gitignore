@@ -6,4 +6,5 @@ settings.json
 *.blg
 *.run.xml
 *.out
+*.toc
 report/svg-inkscape
