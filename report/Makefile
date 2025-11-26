@@ -1,7 +1,10 @@
-TARGET = report
+TARGET = ieee_report
 
 XELATEX = xelatex --shell-escape $(TARGET).tex
-BIBER = biber $(TARGET)
+#BIBER = biber $(TARGET)
+
+# IEEE class use BibTeX
+BIBTEX = bibtex $(TARGET)
 
 .PHONY: all quick
 all: quick
@@ -13,7 +16,7 @@ quick:
 .PHONY: full
 full:
 	$(XELATEX)
-	$(BIBER)
+	$(BIBTEX)
 	$(XELATEX)
 	$(XELATEX)
 	@echo "Full build complete."

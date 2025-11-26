@@ -8,3 +8,4 @@ settings.json
 *.out
 *.toc
 report/svg-inkscape
+report/IEEEtran.cls
