@@ -4,9 +4,11 @@
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{algorithmic}
 \usepackage{graphicx}
+\graphicspath{{images/}}
 \usepackage{textcomp}
 \usepackage{xcolor}
 
+\usepackage{subcaption}
 \usepackage{xurl}
 
 % --- 1. Font and Language Setup for XeLaTeX ---
@@ -271,6 +273,98 @@ Monocular Depth Estimation, Benchmarking, Deep Learning, Computer Vision, Transf
 \end{itemize}
 
 \section{Πειραματικα Αποτελεσματα}
+Ακολουθώντας την διαδικασία που μόλις περιγράφηκε, υπολογίζονται οι μέσοι όροι για κάθε μετρική από κάθε εικόνα σε κάθε σύνολο δεδομένων.
+
+\subsubsection{Ποσοτική Αξιολόγηση}
+
+\begin{table*}[htbp]
+\caption{Συγκριτικα Αποτελεσματα Αξιολογησης Zero-Shot (Lower is better $\downarrow$, Higher is better $\uparrow$)}
+\label{benchmark_table}
+\begin{center}
+    \resizebox{\textwidth}{!}{%
+    \begin{tabular}{l|ccc|ccc|ccc}
+        \hline
+        \multicolumn{1}{c|}{} & \multicolumn{3}{c|}{\textbf{IBims-1 (Indoor/Specialized)}} & \multicolumn{3}{c|}{\textbf{NYU Depth V2 (Indoor)}} & \multicolumn{3}{c}{\textbf{KITTI (Outdoor)}} \\ 
+        \multicolumn{1}{c|}{\textbf{Model}} & \textbf{AbsRel} $\downarrow$ & \textbf{$\delta_1$} $\uparrow$ & \textbf{SILog} $\downarrow$ & \textbf{AbsRel} $\downarrow$ & \textbf{$\delta_1$} $\uparrow$ & \textbf{SILog} $\downarrow$ & \textbf{AbsRel} $\downarrow$ & \textbf{$\delta_1$} $\uparrow$ & \textbf{SILog} $\downarrow$ \\ \hline
+        DAV2-Large & 0.135 & \textbf{0.978} & \textbf{7.037} & 0.054 & 0.964 & 8.557 & 0.113 & \textbf{0.962} & \textbf{10.06} \\
+        DAV2-Indoor-Metric & 0.126 & 0.886 & 7.589 & 0.219 & 0.674 & 9.598 & 0.560 & 0.001 & 12.57 \\
+        DAV2-Outdoor-Metric & 3.185 & 0.001 & 14.55 & 4.283 & 0.000 & 19.60 & 0.091 & 0.917 & 11.63 \\
+        ZoeDepth & 0.200 & 0.611 & 16.86 & 0.146 & 0.826 & 17.24 & 0.104 & 0.906 & 14.40 \\
+        MiDaS-3.0 & 53.10 & 0.941 & 12.12 & 0.102 & 0.900 & 13.69 & 0.239 & 0.912 & 14.21 \\
+        MiDaS-3.1 & 1.042 & 0.966 & 8.930 & \textbf{0.052} & \textbf{0.969} & \textbf{8.111} & \textbf{0.065} & 0.957 & 10.15 \\
+        Marigold-1.1 & \textbf{0.055} & 0.965 & 8.292 & 0.071 & 0.940 & 10.16 & 0.103 & 0.898 & 14.19 \\ \hline
+    \end{tabular}%
+}
+\end{center}
+\end{table*}
+
+\begin{figure*}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{absrel_broken.png}
+        \caption{Απόλυτο Σχετικό Σφάλμα (AbsRel $\downarrow$)}
+        \label{fig:absrel}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{delta1.png}
+        \caption{Ακρίβεια $\delta_1$ ($\uparrow$)}
+        \label{fig:delta1}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{silog.png}
+        \caption{Σφάλμα SILog ($\downarrow$)}
+        \label{fig:silog}
+    \end{subfigure}
+    
+    \caption{Συγκριτική απεικόνιση των μετρικών στα τρία σύνολα δεδομένων. Διακρίνεται η σταθερότητα του DAV2-Large σε αντίθεση με τα εξειδικευμένα μετρικά μοντέλα που εμφανίζουν μεγάλες διακυμάνσεις κατά την αλλαγή πεδίου (domain shift).}
+    \label{fig:metrics_comparison}
+\end{figure*}
+
+Στον Πίνακα \ref{benchmark_table} και στο Σχήμα \ref{fig:metrics_comparison} παρουσιάζεται η συνολική απόδοση των μοντέλων. Από την ανάλυση των μετρήσεων προκύπτουν μερικά άμεσα συμπεράσματα. Πρώτον, το μοντέλο DAV2-Large επιδεικνύει την υψηλότερη ευρωστία (robustness) στο σύνολο των πειραμάτων, επιτυγχάνοντας κορυφαίες τιμές τόσο στα indoor όσο και στα outdoor datasets. Αυτό επιβεβαιώνει την υπεροχή των foundation models που έχουν εκπαιδευτεί σε τεράστια κλίμακα δεδομένων. Δεύτερον, παρατηρείται ένα ενδιαφέρον φαινόμενο απόκλισης μεταξύ των μετρικών AbsRel και $\delta_1$. Συγκεκριμένα, σε ορισμένα πειράματα (όπως φαίνεται στα διαγράμματα), η τιμή του AbsRel εμφανίζεται αυξημένη, υποδηλώνοντας μεγάλο μέσο σφάλμα, παρόλο που η ακρίβεια $\delta_1$ παραμένει σε υψηλά επίπεδα (>0.90). Αυτή η συμπεριφορά οφείλεται στην παρουσία ακραίων τιμών (outliers). Επειδή το AbsRel είναι μέση τιμή, επηρεάζεται έντονα από λίγα pixels με πολύ μεγάλο σφάλμα (π.χ. σε καθρέφτες ή στον ουρανό), ενώ το $\delta_1$, ως ποσοστιαία μετρική, αγνοεί το μέγεθος του σφάλματος εφόσον αυτό ξεπερνά το όριο του 25\%. Συνεπώς, η υψηλή τιμή του $\delta_1$ είναι πιο αντιπροσωπευτική της γενικής συμπεριφοράς του μοντέλου στην πλειονότητα των pixels της εικόνας. Τέλος, μπορούμε να δούμε ότι το DAV2-Indoor-Metric αποτυγχάνει στο σύνολο KITTI που περιέχει εξωτερικές σκηνές και αντίστοιχα το DAV2-Outdoor-Metric αποτυγχάνει στα άλλα δύο σύνολα που περιέχουν σκηνές εσωτερικών χώρων.
+
+\subsubsection{Ανάλυση Χάσματος Πεδίου (Domain Gap Analysis)}
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\linewidth]{domain_gap.png}
+    \caption{Οπτικοποίηση του χάσματος πεδίου (Domain Gap Analysis). Το διάγραμμα απεικονίζει τη δραματική πτώση απόδοσης (αύξηση σφάλματος) των εξειδικευμένων μοντέλων (Metric-Indoor/Outdoor) όταν καλούνται να λειτουργήσουν σε άγνωστο περιβάλλον, συγκριτικά με τη σταθερότητα των μοντέλων σχετικού βάθους (DAV2-Large).}
+    \label{fig:domain_gap}
+\end{figure}
+
+Ένα κρίσιμο ερώτημα της εργασίας αφορά τη δυνατότητα γενίκευσης. Το Σχήμα \ref{fig:domain_gap} απεικονίζει τη μεταβολή της απόδοσης κατά την εναλλαγή μεταξύ εσωτερικών και εξωτερικών σκηνών.
+
+Όπως αναμενόταν, τα μοντέλα που εκπαιδεύτηκαν με αποκλειστικό στόχο το μετρικό βάθος σε συγκεκριμένο πεδίο (Specialized Metric Models), αποτυγχάνουν πλήρως όταν καλούνται να γενικεύσουν. Συγκεκριμένα, το DAV2-Metric-Outdoor καταρρέει στο NYU Depth V2, ενώ αντίστοιχα το DAV2-Metric-Indoor αδυνατεί να αποδώσει στο KITTI. Αντιθέτως, τα μοντέλα σχετικού βάθους (Relative Depth), και ειδικά το DAV2-Large και το MiDaS-3.1, γεφυρώνουν επιτυχώς το χάσμα (Domain Gap), καθώς μαθαίνουν δομικά χαρακτηριστικά της εικόνας αντί να απομνημονεύουν συγκεκριμένες κλίμακες απόστασης.
+
+\subsubsection{Ποιοτική Αξιολόγηση}
+\begin{figure*}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.8\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{visual-ibims.png}
+        \caption{Ποιοτική αξιολόγηση σε εσωτερικό χώρο (IBims-1).}
+        \label{fig:visual_ibims}
+    \end{subfigure}
+    
+    \begin{subfigure}[b]{0.8\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{visual-kitti.png}
+        \caption{Ποιοτική αξιολόγηση σε εξωτερικό περιβάλλον (KITTI).}
+        \label{fig:visual_kitti}
+    \end{subfigure}
+    
+    \caption{Οπτική σύγκριση των αποτελεσμάτων (Qualitative Evaluation). Τα θεμελιώδη μοντέλα (Depth-Anything-V2, Marigold) παράγουν πιο ευκρινείς και δομικά συνεπείς χάρτες βάθους σε σχέση με παλαιότερες προσεγγίσεις, τόσο σε εσωτερικά όσο και σε εξωτερικά σενάρια.}
+    \label{fig:qualitative_results}
+\end{figure*}
+
+Η οπτική επιθεώρηση των αποτελεσμάτων, όπως παρουσιάζεται στα Σχήματα \ref{fig:visual_ibims} και \ref{fig:visual_kitti}, έρχεται να επιβεβαιώσει και να ερμηνεύσει τις ποσοτικές μετρήσεις, αναδεικνύοντας χαρακτηριστικά που δεν αποτυπώνονται πλήρως στους αριθμητικούς δείκτες.
+
+Στο Σχήμα \ref{fig:visual_ibims}, το οποίο απεικονίζει ένα δείγμα από το σύνολο δεδομένων IBims-1, παρατηρείται η ικανότητα του DAV2-Large να διατηρεί ευκρινή τα όρια των αντικειμένων (sharp edges). Σε αντίθεση με τα άλλα μοντέλα που τείνουν να εξομαλύνουν (smooth out) τις λεπτομέρειες, το DAV2 και το Marigold ανακτούν με επιτυχία τη γεωμετρία μικρότερων αντικειμένων, όπως τα πόδια των επίπλων και τα διακοσμητικά στοιχεία. Ειδικότερα, το Marigold, ως μοντέλο διάχυσης, επιδεικνύει εντυπωσιακή λεπτομέρεια στην εντόπιση των ακμών των αντικειμένων. Από την άλλη, είναι εμφανές ότι το παράθυρο στα αριστερά της εικόνας που περιέχει μια αντανάκλαση είναι ένα πολύ δύσκολο σημείο για όλα τα μοντέλα. Αυτός είναι και ένας από τους λόγους επιλογής αυτού του συνόλου δεδομένων.
+
+Αντίστοιχα, στο Σχήμα \ref{fig:visual_kitti} (εξωτερικό περιβάλλον από το σύνολο KITTI), η υπεροχή των θεμελιωδών μοντέλων Depth Anything V2 και Marigold καθίσταται σαφής στη διαχείριση του βάθους σε μεγάλες αποστάσεις. Επιτυγχάνει συνεπή διαχωρισμό του δρόμου από τα οχήματα και το φόντο. Παρατηρείται επίσης ότι αυτά τα μοντέλα διαχειρίζονται πολύ πιο αποτελεσματικά τις λεπτές δομές, όπως τους κορμούς των δέντρων και τους στύλους, που αποτελούν παραδοσιακά σημεία αποτυχίας για τους αλγορίθμους εκτίμησης βάθους.
 
 \section{Συμπερασματα}
 
